@@ -8,7 +8,7 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useHistoryContext } from '../context/HistoryContext';
 import { useTaskContext } from '../context/TaskContext';
 import { useTaskAndHistory } from '../hooks/useTaskAndHistory';
@@ -16,6 +16,7 @@ import type { Task, TaskStatus } from '../types';
 import { Column } from './Column';
 import { TaskCard } from './TaskCard';
 import { EnhancedTaskHistoryLog } from './enhanced/TaskHistoryLog';
+import { EnhancedTaskFilter } from './enhanced/TaskFilter';
 
 const COLUMNS: Array<{
   id: TaskStatus;
@@ -28,14 +29,11 @@ const COLUMNS: Array<{
 ];
 
 export function KanbanBoard() {
-  const { state } = useTaskContext();
-  const { tasks, moveTask, addMoveHistory } = useTaskAndHistory();
+  const { tasks, moveTask, addMoveHistory, moveTaskWithin } =
+    useTaskAndHistory();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [originalStatus, setOriginalStatus] = useState<TaskStatus | null>(null);
-
-  const {
-    state: { history = [] },
-  } = useHistoryContext();
+  const [filterKeyword, setFilterKeyword] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -45,13 +43,24 @@ export function KanbanBoard() {
     })
   );
 
+  const filteredTasks = useMemo(() => {
+    if (!filterKeyword.trim()) return tasks;
+
+    const keyword = filterKeyword.toLowerCase();
+    return tasks.filter(
+      (task) =>
+        task.title.toLowerCase().includes(keyword) ||
+        (task.description && task.description.toLowerCase().includes(keyword))
+    );
+  }, [tasks, filterKeyword]);
+
   const getTasksByStatus = (status: TaskStatus): Task[] => {
-    return state.tasks.filter((task) => task.status === status);
+    return filteredTasks.filter((task) => task.status === status);
   };
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    const task = state.tasks.find((t) => t.id === active.id);
+    const task = tasks.find((t) => t.id === active.id);
     setActiveTask(task || null);
     setOriginalStatus(task?.status || null);
   };
@@ -63,7 +72,7 @@ export function KanbanBoard() {
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    const activeTask = state.tasks.find((t) => t.id === activeId);
+    const activeTask = tasks.find((t) => t.id === activeId);
     if (!activeTask) return;
 
     // Check if we're dropping on a column
@@ -92,19 +101,23 @@ export function KanbanBoard() {
     if (activeId === overId) return;
 
     // Find the active task
-    const activeTask = state.tasks.find((t) => t.id === activeId);
+    const activeTask = tasks.find((t) => t.id === activeId);
     if (!activeTask) return;
 
     // Check if dropping on another task (reordering within column)
-    const overTask = state.tasks.find((t) => t.id === overId);
+    const overTask = tasks.find((t) => t.id === overId);
     if (overTask && activeTask.status === overTask.status) {
       // Reorder tasks within the same column
       const columnTasks = getTasksByStatus(activeTask.status);
       const activeIndex = columnTasks.findIndex((t) => t.id === activeId);
       const overIndex = columnTasks.findIndex((t) => t.id === overId);
+      const columnName = COLUMNS.find(
+        (col) => col.id === finalTask?.status
+      )?.title;
 
-      // For now, we'll just rely on the visual reordering
-      // In a more complex app, we might want to track task order
+      if (activeIndex !== overIndex && finalTask && columnName) {
+        moveTaskWithin(finalTask.status, columnName, activeIndex, overIndex);
+      }
     }
 
     // Check if dropping on a column
@@ -127,6 +140,9 @@ export function KanbanBoard() {
         </header>
 
         <EnhancedTaskHistoryLog />
+        <div className="mt-6">
+          <EnhancedTaskFilter onFilterChange={setFilterKeyword} />
+        </div>
         <DndContext
           sensors={sensors}
           onDragStart={handleDragStart}
@@ -153,6 +169,17 @@ export function KanbanBoard() {
             ) : null}
           </DragOverlay>
         </DndContext>
+        {filterKeyword && filteredTasks.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-4xl mb-4">🔍</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No tasks found
+            </h3>
+            <p className="text-gray-500">
+              Try adjusting your search keywords or create a new task.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

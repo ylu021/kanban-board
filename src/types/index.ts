@@ -21,6 +21,10 @@ export type TaskAction =
     }
   | { type: 'DELETE_TASK'; payload: string }
   | { type: 'MOVE_TASK'; payload: { id: string; status: TaskStatus } }
+  | {
+      type: 'REORDER_TASK';
+      payload: { status: string; reorderedTasks: Task[] };
+    }
   | { type: 'LOAD_TASKS'; payload: Task[] };
 
 export interface Column {

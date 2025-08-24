@@ -59,6 +59,25 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
       return newState;
     }
 
+    case 'REORDER_TASK': {
+      const { status, reorderedTasks } = action.payload;
+      let index = 0;
+      const newState = {
+        ...state,
+        tasks: state.tasks.map((task) => {
+          if (task.status === status) {
+            return reorderedTasks?.[index++] || task;
+          }
+          return task;
+        }),
+      };
+
+      console.log(newState.tasks);
+
+      saveTasksToStorage(newState.tasks);
+      return newState;
+    }
+
     case 'LOAD_TASKS': {
       return {
         ...state,
@@ -81,7 +100,6 @@ const TaskContext = createContext<TaskContextValue | null>(null);
 export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(taskReducer, initialState);
 
-  // Load tasks from storage on mount
   useEffect(() => {
     const savedTasks = loadTasksFromStorage();
     if (savedTasks.length > 0) {
