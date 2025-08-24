@@ -1,5 +1,4 @@
-import type { HistoryEntry } from '../components/enhanced/TaskHistoryLog';
-import type { Task } from '../types';
+import type { HistoryEntry, Task } from '../types';
 
 const TASK_STORAGE_KEY = 'kanbanTasks';
 const HISTORY_STORAGE_KEY = 'kanbanHistory';
@@ -31,7 +30,6 @@ export function loadTasksFromStorage(): Task[] {
 
 export function saveHistoryToStorage(history: HistoryEntry[]): void {
   try {
-    // Only keep last 5 entries before saving
     const limitedHistory = history.slice(-5);
     localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(limitedHistory));
   } catch (error) {

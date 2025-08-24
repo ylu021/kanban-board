@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -9,10 +8,14 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import type { TaskStatus, Task } from '../types';
+import { useState } from 'react';
+import { useHistoryContext } from '../context/HistoryContext';
 import { useTaskContext } from '../context/TaskContext';
+import { useTaskAndHistory } from '../hooks/useTaskAndHistory';
+import type { Task, TaskStatus } from '../types';
 import { Column } from './Column';
 import { TaskCard } from './TaskCard';
+import { EnhancedTaskHistoryLog } from './enhanced/TaskHistoryLog';
 
 const COLUMNS: Array<{
   id: TaskStatus;
@@ -25,8 +28,14 @@ const COLUMNS: Array<{
 ];
 
 export function KanbanBoard() {
-  const { state, dispatch } = useTaskContext();
-  const [activeTask, setActiveTask] = React.useState<Task | null>(null);
+  const { state } = useTaskContext();
+  const { tasks, moveTask, addMoveHistory } = useTaskAndHistory();
+  const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [originalStatus, setOriginalStatus] = useState<TaskStatus | null>(null);
+
+  const {
+    state: { history = [] },
+  } = useHistoryContext();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -44,6 +53,7 @@ export function KanbanBoard() {
     const { active } = event;
     const task = state.tasks.find((t) => t.id === active.id);
     setActiveTask(task || null);
+    setOriginalStatus(task?.status || null);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -53,23 +63,25 @@ export function KanbanBoard() {
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // Find the task being dragged
     const activeTask = state.tasks.find((t) => t.id === activeId);
     if (!activeTask) return;
 
     // Check if we're dropping on a column
     const overColumn = COLUMNS.find((col) => col.id === overId);
     if (overColumn && activeTask.status !== overColumn.id) {
-      dispatch({
-        type: 'MOVE_TASK',
-        payload: { id: activeId, status: overColumn.id },
-      });
+      moveTask(activeId, overColumn.id);
     }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+
+    const finalTask = tasks.find((t) => t.id === active.id);
     setActiveTask(null);
+    if (finalTask && finalTask?.status !== originalStatus) {
+      addMoveHistory(finalTask?.title, finalTask?.status);
+    }
+    setOriginalStatus(null);
 
     if (!over) return;
 
@@ -98,10 +110,7 @@ export function KanbanBoard() {
     // Check if dropping on a column
     const overColumn = COLUMNS.find((col) => col.id === overId);
     if (overColumn && activeTask.status !== overColumn.id) {
-      dispatch({
-        type: 'MOVE_TASK',
-        payload: { id: activeId, status: overColumn.id },
-      });
+      moveTask(activeId, overColumn.id);
     }
   };
 
@@ -117,6 +126,7 @@ export function KanbanBoard() {
           </p>
         </header>
 
+        <EnhancedTaskHistoryLog />
         <DndContext
           sensors={sensors}
           onDragStart={handleDragStart}

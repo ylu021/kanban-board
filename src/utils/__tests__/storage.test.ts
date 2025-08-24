@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { saveTasksToStorage, loadTasksFromStorage } from '../storage';
-import type { Task } from '../../types';
+import {
+  saveTasksToStorage,
+  loadTasksFromStorage,
+  saveHistoryToStorage,
+  loadHistoryFromStorage,
+} from '../storage';
+import type { Task, HistoryEntry } from '../../types';
 
 // Mock localStorage
 const localStorageMock = {
@@ -114,6 +119,110 @@ describe('Storage Utils', () => {
       localStorageMock.getItem.mockReturnValue('invalid json');
 
       const result = loadTasksFromStorage();
+
+      expect(result).toEqual([]);
+      expect(consoleSpy).toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('saveHistoryToStorage', () => {
+    it('should save history to localStorage with correct key', () => {
+      const history: HistoryEntry[] = [
+        {
+          id: '1',
+          action: 'created',
+          taskTitle: 'Test Task',
+          timestamp: new Date(),
+        },
+      ];
+
+      saveHistoryToStorage(history);
+
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        'kanbanHistory',
+        JSON.stringify(history)
+      );
+    });
+
+    it('should limit history to 5 entries when saving', () => {
+      const history: HistoryEntry[] = Array.from({ length: 6 }, (_, i) => ({
+        id: `${i}`,
+        action: 'created' as const,
+        taskTitle: `Task ${i}`,
+        timestamp: new Date(),
+      }));
+
+      saveHistoryToStorage(history);
+
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        'kanbanHistory',
+        expect.any(String)
+      );
+
+      // Verify only last 5 entries were saved
+      const savedData = JSON.parse(localStorageMock.setItem.mock.calls[0][1]);
+      expect(savedData).toHaveLength(5);
+    });
+  });
+
+  describe('loadHistoryFromStorage', () => {
+    it('should return empty array when no history data exists', () => {
+      localStorageMock.getItem.mockReturnValue(null);
+
+      const result = loadHistoryFromStorage();
+
+      expect(result).toEqual([]);
+      expect(localStorageMock.getItem).toHaveBeenCalledWith('kanbanHistory');
+    });
+
+    it('should load and parse history from localStorage', () => {
+      const mockHistory = [
+        {
+          id: '1',
+          action: 'created',
+          taskTitle: 'Test Task',
+          timestamp: new Date().toISOString(),
+        },
+      ];
+
+      localStorageMock.getItem.mockReturnValue(JSON.stringify(mockHistory));
+
+      const result = loadHistoryFromStorage();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].action).toBe('created');
+      expect(result[0].taskTitle).toBe('Test Task');
+      expect(result[0].timestamp).toBeInstanceOf(Date);
+    });
+
+    it('should handle localStorage errors gracefully', () => {
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      localStorageMock.getItem.mockImplementation(() => {
+        throw new Error('Storage error');
+      });
+
+      const result = loadHistoryFromStorage();
+
+      expect(result).toEqual([]);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to load history from localStorage:',
+        expect.any(Error)
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle invalid JSON gracefully', () => {
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      localStorageMock.getItem.mockReturnValue('invalid json');
+
+      const result = loadHistoryFromStorage();
 
       expect(result).toEqual([]);
       expect(consoleSpy).toHaveBeenCalled();

@@ -1,17 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { TaskStatus } from '../types';
 import { useTaskContext } from '../context/TaskContext';
+import { useTaskAndHistory } from '../hooks/useTaskAndHistory';
 
 interface AddTaskFormProps {
   status: TaskStatus;
 }
 
 export function AddTaskForm({ status }: AddTaskFormProps) {
-  const { dispatch } = useTaskContext();
   const [isExpanded, setIsExpanded] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const { addTaskWithHistory } = useTaskAndHistory();
 
   // Auto-focus when expanded
   useEffect(() => {
@@ -24,13 +25,10 @@ export function AddTaskForm({ status }: AddTaskFormProps) {
     e.preventDefault();
     if (!title.trim()) return;
 
-    dispatch({
-      type: 'ADD_TASK',
-      payload: {
-        title: title.trim(),
-        description: description.trim() || undefined,
-        status,
-      },
+    addTaskWithHistory({
+      title: title.trim(),
+      description: description.trim() || undefined,
+      status,
     });
 
     // Reset form

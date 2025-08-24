@@ -5,13 +5,14 @@ import type { Task } from '../types';
 import { useTaskContext } from '../context/TaskContext';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { SquarePen, Trash2 } from 'lucide-react';
+import { useTaskAndHistory } from '../hooks/useTaskAndHistory';
 
 interface TaskCardProps {
   task: Task;
 }
 
 export function TaskCard({ task }: TaskCardProps) {
-  const { dispatch } = useTaskContext();
+  const { updateTaskWithHistory, deleteTaskWithHistory } = useTaskAndHistory();
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -32,12 +33,8 @@ export function TaskCard({ task }: TaskCardProps) {
 
   const handleTitleSubmit = () => {
     if (editTitle.trim() && editTitle !== task.title) {
-      dispatch({
-        type: 'UPDATE_TASK',
-        payload: {
-          id: task.id,
-          updates: { title: editTitle.trim() },
-        },
+      updateTaskWithHistory(task.id, {
+        title: editTitle.trim(),
       });
     }
     setIsEditing(false);
@@ -53,7 +50,7 @@ export function TaskCard({ task }: TaskCardProps) {
   };
 
   const handleDelete = () => {
-    dispatch({ type: 'DELETE_TASK', payload: task.id });
+    deleteTaskWithHistory(task.id);
     setShowDeleteDialog(false);
   };
 
