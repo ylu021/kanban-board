@@ -1,6 +1,6 @@
 # Project Setup
 
-- clone the repo: https://github.com/ylu021/studious-carnival.git
+- clone the repo: [https://github.com/ylu021/studious-carnival.git](https://github.com/ylu021/kanban-board.git)
 
 - install dependencies with `pnpm install`
 
