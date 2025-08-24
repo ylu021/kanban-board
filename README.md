@@ -38,7 +38,7 @@ allowedHosts: [
 Currently reordering within a column is implemented using the array order directly, rather than an explicit `order` field. For this use case, it keeps the implementation simple and effective. Note that this approach is **not scalable**; in a larger or multi-user scenario, an `order` field would be necessary to reliably manage task positions.
 
 # Folder structure
-
+```
 ├── src/
 │ ├── components/ # Components
 │ ├── enhanced/ # Stretched features including HistoryLog and Keyword Filter
@@ -46,7 +46,7 @@ Currently reordering within a column is implemented using the array order direct
 │ ├── types/ # TypeScript definitions
 │ ├── hooks/ # Managing related Task & HistoryLog contexts
 │ └── utils/ # Helper functions
-
+```
 # Time spent
 
 4 hours
