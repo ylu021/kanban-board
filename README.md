@@ -48,6 +48,9 @@ Currently reordering within a column is implemented using the array order direct
 │ ├── hooks/ # Managing related Task & HistoryLog contexts
 │ └── utils/ # Helper functions
 ```
+# Shortcut 
+AI assistance was used since there was no explicit restriction on the instructions, as part of a modern development workflow using prompt-based tools. If AI usage is not permitted, I’m happy to rework this manually.  
+
 # Time spent
 
 4 hours  
