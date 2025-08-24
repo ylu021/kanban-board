@@ -33,7 +33,7 @@ allowedHosts: [
 - React Context + useReducer - since we are using localstorage, it's enough to use a simple, no external deps approach
 - @dnd-kit - it's a popular modern typeScript supported library for draggable components
 
-# Task Reordering
+Task Reordering
 
 Currently reordering within a column is implemented using the array order directly, rather than an explicit `order` field. For this use case, it keeps the implementation simple and effective. Note that this approach is **not scalable**; in a larger or multi-user scenario, an `order` field would be necessary to reliably manage task positions.
 
