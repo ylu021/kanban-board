@@ -26,6 +26,7 @@ allowedHosts: [
     `inserthere`,
 ],
 ```
+Paste the url in your phone to test
 
 # Architecture
 
