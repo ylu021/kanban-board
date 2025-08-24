@@ -9,14 +9,12 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core';
 import { useMemo, useState } from 'react';
-import { useHistoryContext } from '../context/HistoryContext';
-import { useTaskContext } from '../context/TaskContext';
 import { useTaskAndHistory } from '../hooks/useTaskAndHistory';
 import type { Task, TaskStatus } from '../types';
 import { Column } from './Column';
 import { TaskCard } from './TaskCard';
-import { EnhancedTaskHistoryLog } from './enhanced/TaskHistoryLog';
 import { EnhancedTaskFilter } from './enhanced/TaskFilter';
+import { EnhancedTaskHistoryLog } from './enhanced/TaskHistoryLog';
 
 const COLUMNS: Array<{
   id: TaskStatus;

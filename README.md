@@ -1,14 +1,10 @@
 # Project Setup
 
-clone repo
+- clone the repo: https://github.com/ylu021/studious-carnival.git
 
-install dependencies
+- install dependencies with `pnpm install`
 
-pnpm install
-
-Run the app
-
-pnpm run dev
+- Run the app with `pnpm run dev`, open http://localhost:5173 to see the app
 
 # Mobile layout testing setup
 
@@ -33,9 +29,9 @@ allowedHosts: [
 
 # Architecture
 
-- Vite - tradeoff // TODO
-- React Context + useReducer (simple, no external deps)
-- @dnd-kit (modern, TypeScript-first, 8k+ stars)
+- Vite - uses native ES Modules and less boilerplate, faster start and development for project starter
+- React Context + useReducer - since we are using localstorage, it's enough to use a simple, no external deps approach
+- @dnd-kit - it's a popular modern typeScript supported library for draggable components
 
 # Task Reordering
 
@@ -45,7 +41,7 @@ Currently reordering within a column is implemented using the array order direct
 
 ├── src/
 │ ├── components/ # Components
-│ ├── enhanced/ # Enhanced features (prefixed files)
+│ ├── enhanced/ # Stretched features including HistoryLog and Keyword Filter
 │ ├── context/ # State management
 │ ├── types/ # TypeScript definitions
 │ ├── hooks/ # Managing related Task & HistoryLog contexts

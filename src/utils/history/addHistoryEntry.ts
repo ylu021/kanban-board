@@ -1,5 +1,5 @@
 import type { HistoryEntry } from '../../types';
-import { loadHistoryFromStorage, saveHistoryToStorage } from '../storage';
+import { saveHistoryToStorage } from '../storage';
 
 export function addHistoryEntry(
   currentHistory: HistoryEntry[],
