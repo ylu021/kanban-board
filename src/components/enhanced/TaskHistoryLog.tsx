@@ -4,7 +4,7 @@ import { useTaskAndHistory } from '../../hooks/useTaskAndHistory';
 
 export function EnhancedTaskHistoryLog() {
   const [isOpen, setIsOpen] = useState(false);
-  const { history } = useTaskAndHistory();
+  const { history, clearHistory } = useTaskAndHistory();
 
   const getActionText = (entry: HistoryEntry) => {
     switch (entry.action) {
@@ -14,6 +14,8 @@ export function EnhancedTaskHistoryLog() {
         return `Updated task "${entry.taskTitle}"`;
       case 'moved':
         return `Moved task "${entry.taskTitle}"${entry.details ? ` to ${entry.details}` : ''}`;
+      case 'reordered':
+        return `Reordered task "${entry.taskTitle}" in ${entry.details}`;
       case 'deleted':
         return `Deleted task "${entry.taskTitle}"`;
     }
@@ -55,9 +57,15 @@ export function EnhancedTaskHistoryLog() {
         {isOpen && (
           <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 animate-slide-up">
             <div className="p-4">
-              <h3 className="font-medium text-gray-900 mb-3">
-                Recent Activity
-              </h3>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-medium text-gray-900">Recent Activity</h3>
+                <button
+                  onClick={clearHistory}
+                  className="text-primary-500 hover:text-primary-600"
+                >
+                  Clear All
+                </button>
+              </div>
               <hr className="text-gray-300 pb-2" />
 
               <div className="space-y-3 max-h-60 overflow-y-auto">

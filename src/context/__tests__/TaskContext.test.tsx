@@ -111,6 +111,56 @@ describe('TaskContext', () => {
     expect(result.current.state.tasks[0].status).toBe('inProgress');
   });
 
+  it.only('should reorder tasks within a column', () => {
+    const { result } = renderHook(() => useTaskContext(), { wrapper });
+
+    act(() => {
+      result.current.dispatch({
+        type: 'ADD_TASK',
+        payload: { title: 'Task 1', status: 'todo' },
+      });
+      result.current.dispatch({
+        type: 'ADD_TASK',
+        payload: { title: 'Task 2', status: 'todo' },
+      });
+      result.current.dispatch({
+        type: 'ADD_TASK',
+        payload: { title: 'Task 3', status: 'todo' },
+      });
+    });
+
+    const columnTasks = result.current.state.tasks.filter(
+      (t) => t.status === 'todo'
+    );
+
+    expect(columnTasks.map((t) => t.title)).toEqual([
+      'Task 1',
+      'Task 2',
+      'Task 3',
+    ]);
+
+    const reorderedTasks = [columnTasks[2], columnTasks[0], columnTasks[1]];
+
+    act(() => {
+      result.current.dispatch({
+        type: 'REORDER_TASK',
+        payload: {
+          status: 'todo',
+          reorderedTasks,
+        },
+      });
+    });
+    const updatedColumnTasks = result.current.state.tasks.filter(
+      (t) => t.status === 'todo'
+    );
+
+    expect(updatedColumnTasks.map((t) => t.title)).toEqual([
+      'Task 3',
+      'Task 1',
+      'Task 2',
+    ]);
+  });
+
   it('should delete a task', () => {
     const { result } = renderHook(() => useTaskContext(), { wrapper });
 

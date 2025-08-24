@@ -59,10 +59,13 @@ export function useTaskAndHistory() {
       type: 'REORDER_TASK',
       payload: { status, reorderedTasks },
     });
+  };
+
+  const addReorderedHistory = (taskTitle: string, details: string) => {
     historyContext.addHistory({
-      action: 'moved',
-      taskTitle: movedTask.title,
-      details: `within ${columnName}`,
+      action: 'reordered',
+      taskTitle,
+      details,
     });
   };
 
@@ -86,18 +89,13 @@ export function useTaskAndHistory() {
   };
 
   return {
-    // Task state and original dispatch
     tasks: taskContext.state.tasks,
-    taskDispatch: taskContext.dispatch,
-
-    // History state and methods
     history: historyContext.state.history,
-    historyDispatch: historyContext.dispatch,
-    addHistory: historyContext.addHistory,
     clearHistory: historyContext.clearHistory,
     moveTask,
     moveTaskWithin,
     addMoveHistory,
+    addReorderedHistory,
     addTaskWithHistory,
     updateTaskWithHistory,
     deleteTaskWithHistory,

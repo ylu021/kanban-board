@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { loadHistoryFromStorage } from '../utils/storage';
+import { loadHistoryFromStorage, saveHistoryToStorage } from '../utils/storage';
 import type { HistoryEntry } from '../types';
 import { addHistoryEntry } from '../utils/history/addHistoryEntry';
 
@@ -9,7 +9,7 @@ interface HistoryState {
 
 type HistoryAction =
   | { type: 'LOAD_HISTORY'; payload: HistoryEntry[] }
-  | { type: 'ADD_HISTORY'; payload: Omit<HistoryEntry, 'timestamp'> }
+  | { type: 'ADD_HISTORY'; payload: Omit<HistoryEntry, 'id' | 'timestamp'> }
   | { type: 'CLEAR_HISTORY' };
 
 const initialState: HistoryState = {
@@ -37,6 +37,7 @@ function historyReducer(
     }
 
     case 'CLEAR_HISTORY': {
+      saveHistoryToStorage([]);
       return {
         ...state,
         history: [],

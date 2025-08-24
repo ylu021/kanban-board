@@ -72,8 +72,6 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         }),
       };
 
-      console.log(newState.tasks);
-
       saveTasksToStorage(newState.tasks);
       return newState;
     }

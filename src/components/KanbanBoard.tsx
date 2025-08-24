@@ -29,8 +29,13 @@ const COLUMNS: Array<{
 ];
 
 export function KanbanBoard() {
-  const { tasks, moveTask, addMoveHistory, moveTaskWithin } =
-    useTaskAndHistory();
+  const {
+    tasks,
+    moveTask,
+    addMoveHistory,
+    addReorderedHistory,
+    moveTaskWithin,
+  } = useTaskAndHistory();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [originalStatus, setOriginalStatus] = useState<TaskStatus | null>(null);
   const [filterKeyword, setFilterKeyword] = useState('');
@@ -87,8 +92,10 @@ export function KanbanBoard() {
 
     const finalTask = tasks.find((t) => t.id === active.id);
     setActiveTask(null);
+    let historyAdded = false;
     if (finalTask && finalTask?.status !== originalStatus) {
       addMoveHistory(finalTask?.title, finalTask?.status);
+      historyAdded = true;
     }
     setOriginalStatus(null);
 
@@ -117,6 +124,9 @@ export function KanbanBoard() {
 
       if (activeIndex !== overIndex && finalTask && columnName) {
         moveTaskWithin(finalTask.status, columnName, activeIndex, overIndex);
+        if (!historyAdded) {
+          addReorderedHistory(finalTask.title, columnName);
+        }
       }
     }
 
