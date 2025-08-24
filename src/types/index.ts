@@ -28,3 +28,11 @@ export interface Column {
   title: string;
   tasks: Task[];
 }
+
+export interface HistoryEntry {
+  id: string;
+  action: 'created' | 'updated' | 'moved' | 'deleted';
+  taskTitle: string;
+  timestamp: Date;
+  details?: string;
+}
