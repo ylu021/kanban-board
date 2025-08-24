@@ -6,7 +6,6 @@ export function useTaskAndHistory() {
   const taskContext = useTaskContext();
   const historyContext = useHistoryContext();
 
-  // Enhanced task operations with automatic history tracking
   const addTaskWithHistory = (
     task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>
   ) => {
@@ -28,6 +27,7 @@ export function useTaskAndHistory() {
     historyContext.addHistory({
       action: 'updated',
       taskTitle: updates.title || task.title,
+      prevTitle: task.title,
     });
   };
 
@@ -37,7 +37,6 @@ export function useTaskAndHistory() {
 
   const moveTaskWithin = (
     status: TaskStatus,
-    columnName: string,
     activeIndex: number,
     overIndex: number
   ) => {
@@ -47,14 +46,7 @@ export function useTaskAndHistory() {
     const reorderedTasks = [...columnTasks];
     const [movedTask] = reorderedTasks.splice(activeIndex, 1);
     reorderedTasks.splice(overIndex, 0, movedTask);
-    // let index = 0;
-    // const updatedTasks = taskContext.state.tasks.map((task) => {
-    //   if (task.status === status) {
-    //     // replace with reordered
-    //     return reorderedTasks[index++];
-    //   }
-    //   return task;
-    // });
+
     taskContext.dispatch({
       type: 'REORDER_TASK',
       payload: { status, reorderedTasks },

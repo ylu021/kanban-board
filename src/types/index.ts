@@ -36,6 +36,7 @@ export interface Column {
 export interface HistoryEntry {
   id: string;
   action: 'created' | 'updated' | 'moved' | 'deleted' | 'reordered';
+  prevTitle?: string;
   taskTitle: string;
   timestamp: Date;
   details?: string;

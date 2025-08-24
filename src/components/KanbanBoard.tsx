@@ -121,7 +121,7 @@ export function KanbanBoard() {
       )?.title;
 
       if (activeIndex !== overIndex && finalTask && columnName) {
-        moveTaskWithin(finalTask.status, columnName, activeIndex, overIndex);
+        moveTaskWithin(finalTask.status, activeIndex, overIndex);
         if (!historyAdded) {
           addReorderedHistory(finalTask.title, columnName);
         }

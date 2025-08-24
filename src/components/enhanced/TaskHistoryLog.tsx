@@ -11,7 +11,7 @@ export function EnhancedTaskHistoryLog() {
       case 'created':
         return `Created task "${entry.taskTitle}"`;
       case 'updated':
-        return `Updated task "${entry.taskTitle}"`;
+        return `Updated task ${entry.prevTitle} to "${entry.taskTitle}"`;
       case 'moved':
         return `Moved task "${entry.taskTitle}"${entry.details ? ` to ${entry.details}` : ''}`;
       case 'reordered':
