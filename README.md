@@ -1,6 +1,6 @@
 # Project Setup
 
-- clone the repo: https://github.com/ylu021/studious-carnival.git
+- clone the repo with `git clone https://github.com/ylu021/kanban-board.git`
 
 - install dependencies with `pnpm install`
 
@@ -48,10 +48,13 @@ Currently reordering within a column is implemented using the array order direct
 │ ├── hooks/ # Managing related Task & HistoryLog contexts
 │ └── utils/ # Helper functions
 ```
+# Shortcut 
+AI assistance was used since there was no explicit restriction on the instructions, as part of a modern development workflow using prompt-based tools. If AI usage is not permitted, I’m happy to rework this manually.  
+
 # Time spent
 
-4 hours
-1 hour for setting up the projects + running the boilerplate
-1 hour for refining the boilerplate code
-1 hour for stretch goals implementations and testing
-1 hour for recognizing missing requirement in step1 for move task within column and final checks
+4 hours  
+1 hour for setting up the projects + running the boilerplate  
+1 hour for refining the boilerplate code  
+1 hour for stretch goals implementations and testing  
+1 hour for recognizing missing requirement in step1 for move task within column and final checks  
