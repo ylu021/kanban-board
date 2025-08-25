@@ -106,14 +106,13 @@ export function KanbanBoard() {
     if (activeId === overId) return;
 
     // Find the active task
-    const activeTask = tasks.find((t) => t.id === activeId);
-    if (!activeTask) return;
+    if (!finalTask) return;
 
     // Check if dropping on another task (reordering within column)
     const overTask = tasks.find((t) => t.id === overId);
-    if (overTask && activeTask.status === overTask.status) {
+    if (overTask && finalTask.status === overTask.status) {
       // Reorder tasks within the same column
-      const columnTasks = getTasksByStatus(activeTask.status);
+      const columnTasks = getTasksByStatus(finalTask.status);
       const activeIndex = columnTasks.findIndex((t) => t.id === activeId);
       const overIndex = columnTasks.findIndex((t) => t.id === overId);
       const columnName = COLUMNS.find(
@@ -123,6 +122,7 @@ export function KanbanBoard() {
       if (activeIndex !== overIndex && finalTask && columnName) {
         moveTaskWithin(finalTask.status, activeIndex, overIndex);
         if (!historyAdded) {
+          historyAdded = true;
           addReorderedHistory(finalTask.title, columnName);
         }
       }
@@ -130,7 +130,15 @@ export function KanbanBoard() {
 
     // Check if dropping on a column
     const overColumn = COLUMNS.find((col) => col.id === overId);
-    if (overColumn && activeTask.status !== overColumn.id) {
+    if (overColumn && !overTask && finalTask?.status === overColumn.id) {
+      // bottom drag within same column
+      const columnTasks = getTasksByStatus(overColumn.id);
+      const activeIndex = columnTasks.findIndex((t) => t.id === activeId);
+      const lastIndex = columnTasks.length - 1;
+      if (activeIndex !== lastIndex) {
+        moveTaskWithin(overColumn.id, activeIndex, lastIndex);
+      }
+    } else if (overColumn && finalTask.status !== overColumn.id) {
       moveTask(activeId, overColumn.id);
     }
   };
